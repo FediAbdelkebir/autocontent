@@ -1,5 +1,6 @@
 import { db } from "./index";
 import * as schema from "@shared/schema";
+import { sql } from "drizzle-orm";
 
 async function seed() {
   try {
@@ -69,9 +70,12 @@ async function seed() {
 
     for (const source of contentSources) {
       // Check if the source already exists
-      const existingSource = await db.query.contentSources.findFirst({
-        where: { name: source.name } as any
-      });
+      const existingSources = await db.select()
+        .from(schema.contentSources)
+        .where(sql`${schema.contentSources.name} = ${source.name}`)
+        .limit(1);
+      
+      const existingSource = existingSources[0];
 
       if (!existingSource) {
         await db.insert(schema.contentSources).values(source);
@@ -117,9 +121,12 @@ async function seed() {
 
     for (const template of videoTemplates) {
       // Check if the template already exists
-      const existingTemplate = await db.query.videoTemplates.findFirst({
-        where: { name: template.name } as any
-      });
+      const existingTemplates = await db.select()
+        .from(schema.videoTemplates)
+        .where(sql`${schema.videoTemplates.name} = ${template.name}`)
+        .limit(1);
+      
+      const existingTemplate = existingTemplates[0];
 
       if (!existingTemplate) {
         await db.insert(schema.videoTemplates).values(template);
@@ -158,9 +165,12 @@ async function seed() {
 
     for (const platform of socialPlatforms) {
       // Check if the platform already exists
-      const existingPlatform = await db.query.socialPlatforms.findFirst({
-        where: { name: platform.name } as any
-      });
+      const existingPlatforms = await db.select()
+        .from(schema.socialPlatforms)
+        .where(sql`${schema.socialPlatforms.name} = ${platform.name}`)
+        .limit(1);
+      
+      const existingPlatform = existingPlatforms[0];
 
       if (!existingPlatform) {
         await db.insert(schema.socialPlatforms).values(platform);
@@ -206,9 +216,12 @@ async function seed() {
 
     for (const integration of makeIntegrations) {
       // Check if the integration already exists
-      const existingIntegration = await db.query.makeIntegration.findFirst({
-        where: { name: integration.name } as any
-      });
+      const existingIntegrations = await db.select()
+        .from(schema.makeIntegration)
+        .where(sql`${schema.makeIntegration.name} = ${integration.name}`)
+        .limit(1);
+      
+      const existingIntegration = existingIntegrations[0];
 
       if (!existingIntegration) {
         await db.insert(schema.makeIntegration).values(integration);
@@ -264,9 +277,12 @@ async function seed() {
 
     for (const item of contentItems) {
       // Check if the item already exists
-      const existingItem = await db.query.contentItems.findFirst({
-        where: { title: item.title } as any
-      });
+      const existingItems = await db.select()
+        .from(schema.contentItems)
+        .where(sql`${schema.contentItems.title} = ${item.title}`)
+        .limit(1);
+      
+      const existingItem = existingItems[0];
 
       if (!existingItem) {
         await db.insert(schema.contentItems).values(item);
