@@ -647,16 +647,20 @@ Check out our latest ${template.name.toLowerCase()} video created from ${source.
           });
           
           // Send completion notification to Slack
-          await sendAlertToSlack(
-            'Video Generation Complete',
-            `Successfully generated video "${contentTitle}". Social media posts have been scheduled.`,
-            'success',
-            {
-              source: 'content-generator',
-              videoId: video.id,
-              socialPlatforms: platforms.length
-            }
-          );
+          try {
+            await sendAlertToSlack(
+              'Video Generation Complete',
+              `Successfully generated video "${contentTitle}". Social media posts have been scheduled.`,
+              'success',
+              {
+                source: 'content-generator',
+                videoId: video.id,
+                socialPlatforms: platforms.length
+              }
+            );
+          } catch (slackError) {
+            console.log('Slack notification failed but content generation completed successfully');
+          }
         } catch (error) {
           console.error('Error in video processing completion:', error);
           
@@ -672,16 +676,20 @@ Check out our latest ${template.name.toLowerCase()} video created from ${source.
           });
           
           // Send error alert to Slack
-          await sendAlertToSlack(
-            'Video Generation Failed',
-            `There was an error generating video "${contentTitle}".`,
-            'error',
-            {
-              source: 'content-generator',
-              videoId: video.id,
-              error: errorMessage
-            }
-          );
+          try {
+            await sendAlertToSlack(
+              'Video Generation Failed',
+              `There was an error generating video "${contentTitle}".`,
+              'error',
+              {
+                source: 'content-generator',
+                videoId: video.id,
+                error: errorMessage
+              }
+            );
+          } catch (slackError) {
+            console.log('Slack error notification failed');
+          }
         }
       }, 5000); // 5 second delay to simulate processing
       
@@ -705,15 +713,19 @@ Check out our latest ${template.name.toLowerCase()} video created from ${source.
       });
       
       // Send error alert to Slack
-      await sendAlertToSlack(
-        'Content Generation Failed',
-        `There was an error starting the content generation process.`,
-        'error',
-        {
-          source: 'content-generator',
-          error: errorMessage
-        }
-      );
+      try {
+        await sendAlertToSlack(
+          'Content Generation Failed',
+          `There was an error starting the content generation process.`,
+          'error',
+          {
+            source: 'content-generator',
+            error: errorMessage
+          }
+        );
+      } catch (slackError) {
+        console.log('Slack error notification failed');
+      }
       
       return res.status(500).json({ error: 'Failed to generate content' });
     }

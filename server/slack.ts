@@ -27,7 +27,8 @@ export async function sendSlackMessage(
     return response.ts;
   } catch (error) {
     console.error('Error sending Slack message:', error);
-    throw error;
+    // Log error but don't throw to prevent app crashes
+    return undefined;
   }
 }
 
@@ -44,67 +45,68 @@ export async function sendAlertToSlack(
   type: "error" | "warning" | "info" | "success",
   details?: Record<string, any>
 ): Promise<void> {
-  const channel = process.env.SLACK_CHANNEL_ID!;
-  
-  // Map type to emoji
-  const typeEmoji = {
-    error: "🚨",
-    warning: "⚠️",
-    info: "ℹ️",
-    success: "✅"
-  };
-  
-  // Create the message blocks
-  const blocks = [
-    {
-      type: "header",
-      text: {
-        type: "plain_text",
-        text: `${typeEmoji[type]} ${title}`,
-        emoji: true
-      }
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: message
-      }
-    }
-  ];
-  
-  // Add details if provided
-  if (details && Object.keys(details).length > 0) {
-    const detailsText = Object.entries(details)
-      .map(([key, value]) => `*${key}:* ${JSON.stringify(value)}`)
-      .join("\n");
+  try {
+    const channel = process.env.SLACK_CHANNEL_ID!;
     
+    // Map type to emoji
+    const typeEmoji = {
+      error: "🚨",
+      warning: "⚠️",
+      info: "ℹ️",
+      success: "✅"
+    };
+    
+    // Create the message blocks
+    const blocks = [
+      {
+        type: "header",
+        text: {
+          type: "plain_text",
+          text: `${typeEmoji[type]} ${title}`,
+          emoji: true
+        }
+      },
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: message
+        }
+      }
+    ];
+    
+    // Add details if provided
+    if (details && Object.keys(details).length > 0) {
+      const detailsText = Object.entries(details)
+        .map(([key, value]) => `*${key}:* ${JSON.stringify(value)}`)
+        .join("\n");
+      
+      blocks.push({
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: `*Details:*\n${detailsText}`
+        }
+      });
+    }
+    
+    // Add timestamp with separator
     blocks.push({
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `*Details:*\n${detailsText}`
+        text: `---\n*Time:* ${new Date().toISOString()}`
       }
     });
+    
+    // Send the message
+    await sendSlackMessage({
+      channel,
+      blocks: blocks as any,
+      text: `${typeEmoji[type]} ${title}: ${message}` // Fallback text
+    });
+  } catch (error) {
+    // Log error but don't throw - allow application to continue
+    console.error('Failed to send alert to Slack:', error);
   }
-  
-  // Add timestamp
-  blocks.push({
-    type: "divider"
-  });
-  
-  blocks.push({
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `*Time:* ${new Date().toISOString()}`
-    }
-  });
-  
-  // Send the message
-  await sendSlackMessage({
-    channel,
-    blocks: blocks as any,
-    text: `${typeEmoji[type]} ${title}: ${message}` // Fallback text
-  });
 }
