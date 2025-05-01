@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import * as storage from "./storage";
+import { sendAlertToSlack } from "./slack";
 import { z } from "zod";
 import { 
   contentSourceSchema,
@@ -294,6 +295,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         entityId: newAlert.id
       });
       
+      // Send alert to Slack
+      try {
+        await sendAlertToSlack(
+          newAlert.title,
+          newAlert.message,
+          newAlert.type as "error" | "warning" | "info" | "success",
+          { source: newAlert.source }
+        );
+      } catch (slackError) {
+        console.error('Failed to send alert to Slack:', slackError);
+        // Don't fail the request if Slack notification fails
+      }
+      
       return res.status(201).json(newAlert);
     } catch (error) {
       console.error('Error creating alert:', error);
@@ -456,12 +470,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
         case 'alert':
           // Create system alert
-          await storage.createAlert({
+          const alert = await storage.createAlert({
             title: data.title || 'System Alert',
             message: data.message || 'An issue was detected by Make.com',
             type: data.alertType || 'warning',
             source: 'make.com'
           });
+          
+          // Send to Slack for immediate notification
+          try {
+            await sendAlertToSlack(
+              alert.title,
+              alert.message,
+              alert.type as "error" | "warning" | "info" | "success",
+              { 
+                source: alert.source,
+                details: data.details || {},
+                timestamp: alert.createdAt.toISOString()
+              }
+            );
+          } catch (slackError) {
+            console.error('Failed to send Make.com alert to Slack:', slackError);
+          }
           break;
       }
       
@@ -469,6 +499,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error processing Make.com webhook:', error);
       return res.status(500).json({ error: 'Failed to process webhook' });
+    }
+  });
+
+  // Test endpoint for Slack alerts (for development use)
+  app.post(`${apiPrefix}/test-slack-alert`, async (req, res) => {
+    try {
+      const { title, message, type, details } = req.body;
+      
+      if (!title || !message || !type) {
+        return res.status(400).json({ 
+          error: 'Missing required fields. Please provide title, message, and type.' 
+        });
+      }
+      
+      // Send test alert to Slack
+      await sendAlertToSlack(
+        title,
+        message,
+        type,
+        details || { source: 'test-endpoint' }
+      );
+      
+      // Log the test
+      await storage.createActivityLog({
+        action: 'test_slack_alert',
+        status: 'success',
+        message: `Sent test Slack alert: ${title}`,
+        details: { title, message, type }
+      });
+      
+      return res.status(200).json({ success: true, message: 'Test alert sent to Slack' });
+    } catch (error) {
+      console.error('Error sending test Slack alert:', error);
+      return res.status(500).json({ error: 'Failed to send test alert to Slack' });
     }
   });
 
