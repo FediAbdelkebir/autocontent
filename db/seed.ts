@@ -352,9 +352,12 @@ async function seed() {
       for (const video of videos) {
         if (video.contentItemId && video.templateId) {
           // Check if the video already exists
-          const existingVideo = await db.query.videos.findFirst({
-            where: { title: video.title } as any
-          });
+          const existingVideos = await db.select()
+            .from(schema.videos)
+            .where(sql`${schema.videos.title} = ${video.title}`)
+            .limit(1);
+          
+          const existingVideo = existingVideos[0];
 
           if (!existingVideo) {
             await db.insert(schema.videos).values(video);
@@ -465,12 +468,12 @@ async function seed() {
       for (const post of socialPosts) {
         if (post.videoId && post.platformId) {
           // Check if the post already exists
-          const existingPost = await db.query.socialPosts.findFirst({
-            where: {
-              videoId: post.videoId,
-              platformId: post.platformId
-            } as any
-          });
+          const existingPosts = await db.select()
+            .from(schema.socialPosts)
+            .where(sql`${schema.socialPosts.videoId} = ${post.videoId} AND ${schema.socialPosts.platformId} = ${post.platformId}`)
+            .limit(1);
+          
+          const existingPost = existingPosts[0];
 
           if (!existingPost) {
             await db.insert(schema.socialPosts).values(post);
@@ -502,9 +505,12 @@ async function seed() {
 
     for (const alert of alerts) {
       // Check if the alert already exists
-      const existingAlert = await db.query.alerts.findFirst({
-        where: { title: alert.title } as any
-      });
+      const existingAlerts = await db.select()
+        .from(schema.alerts)
+        .where(sql`${schema.alerts.title} = ${alert.title}`)
+        .limit(1);
+      
+      const existingAlert = existingAlerts[0];
 
       if (!existingAlert) {
         await db.insert(schema.alerts).values(alert);
