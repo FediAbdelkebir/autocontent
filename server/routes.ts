@@ -535,6 +535,192 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ error: 'Failed to send test alert to Slack' });
     }
   });
+  
+  // Content generation endpoint
+  app.post(`${apiPrefix}/generate-content`, async (req, res) => {
+    try {
+      const { sourceId, templateId } = req.body;
+      
+      if (!sourceId || !templateId) {
+        return res.status(400).json({ 
+          error: 'Missing required fields. Please provide sourceId and templateId.' 
+        });
+      }
+      
+      // Get source and template info
+      const source = await storage.getContentSourceById(sourceId);
+      const template = await storage.getVideoTemplateById(templateId);
+      
+      if (!source) {
+        return res.status(404).json({ error: 'Content source not found' });
+      }
+      
+      if (!template) {
+        return res.status(404).json({ error: 'Video template not found' });
+      }
+      
+      // Create content item
+      const contentTitle = `New ${template.name} from ${source.name}`;
+      const contentItem = await storage.createContentItem({
+        title: contentTitle,
+        description: `Automatically generated content using ${template.name} template from ${source.name}`,
+        sourceId: source.id,
+        originalUrl: `https://example.com/${source.name.toLowerCase().replace(/\s+/g, '-')}`,
+        thumbnailUrl: 'https://picsum.photos/600/400',
+        mediaType: 'video',
+        contentData: {
+          generatedAt: new Date().toISOString(),
+          sourceName: source.name,
+          templateName: template.name
+        }
+      });
+      
+      // Create video
+      const video = await storage.createVideo({
+        title: contentTitle,
+        description: `Video generated from ${source.name} using ${template.name} template`,
+        contentItemId: contentItem.id,
+        templateId: template.id,
+        duration: Math.floor(Math.random() * 60) + 30, // Random duration between 30-90 seconds
+        videoUrl: 'https://example.com/video.mp4',
+        thumbnailUrl: 'https://picsum.photos/600/400',
+        status: 'processing'
+      });
+      
+      // Log activity
+      await storage.createActivityLog({
+        action: 'generate_content',
+        status: 'success',
+        message: `Started content generation: ${contentTitle}`,
+        entityType: 'content_item',
+        entityId: contentItem.id,
+        details: {
+          sourceId,
+          templateId,
+          videoId: video.id
+        }
+      });
+      
+      // Send notification to Slack
+      await sendAlertToSlack(
+        'Content Generation Started',
+        `Started generating content "${contentTitle}" using ${template.name} template from ${source.name}.`,
+        'info',
+        {
+          source: 'content-generator',
+          contentItemId: contentItem.id,
+          videoId: video.id
+        }
+      );
+      
+      // In a real implementation, this would trigger a Make.com workflow
+      // For demo purposes, we'll simulate this by updating the video status after a delay
+      setTimeout(async () => {
+        try {
+          // Update video to completed
+          await storage.updateVideo(video.id, {
+            status: 'ready',
+            completedAt: new Date()
+          });
+          
+          // Create social posts
+          const platforms = await storage.getSocialPlatforms();
+          for (const platform of platforms) {
+            await storage.createSocialPost({
+              videoId: video.id,
+              platformId: platform.id,
+              scheduledFor: new Date(),
+              status: 'scheduled',
+              postData: {
+                hashtags: ['entertainment', 'gaming', 'automation'],
+                caption: `New content alert! 🎮 ${contentTitle}`,
+                description: `Check out our latest ${template.name.toLowerCase()} video created from ${source.name}.`,
+                title: `${contentTitle} - Perfect for ${platform.name}!`
+              }
+            });
+          }
+          
+          // Log completion
+          await storage.createActivityLog({
+            action: 'video_ready',
+            status: 'success',
+            message: `Video ready: ${contentTitle}`,
+            entityType: 'video',
+            entityId: video.id
+          });
+          
+          // Send completion notification to Slack
+          await sendAlertToSlack(
+            'Video Generation Complete',
+            `Successfully generated video "${contentTitle}". Social media posts have been scheduled.`,
+            'success',
+            {
+              source: 'content-generator',
+              videoId: video.id,
+              socialPlatforms: platforms.length
+            }
+          );
+        } catch (error) {
+          console.error('Error in video processing completion:', error);
+          
+          // Log error
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          
+          await storage.createActivityLog({
+            action: 'video_generation_error',
+            status: 'error',
+            message: `Error completing video generation: ${errorMessage}`,
+            entityType: 'video',
+            entityId: video.id
+          });
+          
+          // Send error alert to Slack
+          await sendAlertToSlack(
+            'Video Generation Failed',
+            `There was an error generating video "${contentTitle}".`,
+            'error',
+            {
+              source: 'content-generator',
+              videoId: video.id,
+              error: errorMessage
+            }
+          );
+        }
+      }, 5000); // 5 second delay to simulate processing
+      
+      return res.status(201).json({
+        success: true,
+        message: 'Content generation started',
+        title: contentTitle,
+        contentItemId: contentItem.id,
+        videoId: video.id
+      });
+    } catch (error) {
+      console.error('Error generating content:', error);
+      
+      // Log error
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      await storage.createActivityLog({
+        action: 'generate_content_error',
+        status: 'error',
+        message: `Content generation failed: ${errorMessage}`
+      });
+      
+      // Send error alert to Slack
+      await sendAlertToSlack(
+        'Content Generation Failed',
+        `There was an error starting the content generation process.`,
+        'error',
+        {
+          source: 'content-generator',
+          error: errorMessage
+        }
+      );
+      
+      return res.status(500).json({ error: 'Failed to generate content' });
+    }
+  });
 
   const httpServer = createServer(app);
 
