@@ -90,13 +90,15 @@ export async function sendAlertToSlack(
   
   // Add timestamp
   blocks.push({
-    type: "context",
-    elements: [
-      {
-        type: "mrkdwn",
-        text: `*Time:* ${new Date().toISOString()}`
-      }
-    ] as any
+    type: "divider"
+  });
+  
+  blocks.push({
+    type: "section",
+    text: {
+      type: "mrkdwn",
+      text: `*Time:* ${new Date().toISOString()}`
+    }
   });
   
   // Send the message

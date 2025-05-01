@@ -633,12 +633,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 Check out our latest ${template.name.toLowerCase()} video created from ${source.name}.`,
               hashtags: '#entertainment #gaming #automation',
               status: 'scheduled',
-              scheduledAt: new Date(),
-              postData: {
-                caption: `New content alert! 🎮 ${contentTitle}`,
-                description: `Check out our latest ${template.name.toLowerCase()} video created from ${source.name}.`,
-                title: `${contentTitle} - Perfect for ${platform.name}!`
-              }
+              scheduledAt: new Date()
             });
           }
           
