@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
@@ -10,11 +10,13 @@ import { ActivityLogComponent } from "@/components/dashboard/activity-log";
 import { ContentTable } from "@/components/dashboard/content-table";
 import { IntegrationStatus } from "@/components/dashboard/integration-status";
 import { TemplateLibrary } from "@/components/dashboard/template-library";
+import { ContentGenerator } from "@/components/dashboard/content-generator";
 import { Link } from "wouter";
 import { formatTimeAgo } from "@/lib/utils";
 
 const Dashboard = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [timeFrame, setTimeFrame] = useState("last_24_hours");
   
   // Fetch dashboard stats
@@ -48,16 +50,28 @@ const Dashboard = () => {
   const { data: templates, isLoading: isLoadingTemplates, error: templatesError } = useQuery({
     queryKey: ['/api/video-templates'],
   });
+  
+  // Fetch content sources
+  const { data: contentSources, isLoading: isLoadingContentSources, error: contentSourcesError } = useQuery({
+    queryKey: ['/api/content-sources'],
+  });
+
+  const handleContentGenerationSuccess = () => {
+    // Refresh data after successful content generation
+    queryClient.invalidateQueries({ queryKey: ['/api/dashboard/recent-content'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/dashboard/stats'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/activity-logs'] });
+  };
 
   useEffect(() => {
-    if (statsError || contentError || logsError || alertsError || integrationsError || templatesError) {
+    if (statsError || contentError || logsError || alertsError || integrationsError || templatesError || contentSourcesError) {
       toast({
         title: "Error loading dashboard data",
         description: "There was a problem fetching the dashboard information.",
         variant: "destructive"
       });
     }
-  }, [statsError, contentError, logsError, alertsError, integrationsError, templatesError, toast]);
+  }, [statsError, contentError, logsError, alertsError, integrationsError, templatesError, contentSourcesError, toast]);
 
   const formatContentItems = () => {
     if (!recentContent || recentContent.length === 0) return [];
@@ -253,8 +267,17 @@ const Dashboard = () => {
             <ContentTable items={formatContentItems()} />
           </div>
           
-          {/* Make.com Integration & Templates */}
+          {/* Content Generator & Make.com Integration */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            {/* Content Generator */}
+            <div className="bg-surface rounded-lg p-5">
+              <ContentGenerator 
+                contentSources={contentSources || []}
+                videoTemplates={templates || []}
+                onSuccess={handleContentGenerationSuccess}
+              />
+            </div>
+            
             {/* Make.com Integration Status */}
             <div className="bg-surface rounded-lg p-5">
               <IntegrationStatus 
@@ -265,31 +288,38 @@ const Dashboard = () => {
                 }}
               />
             </div>
-            
-            {/* Template Library */}
-            <div className="bg-surface rounded-lg p-5">
-              <TemplateLibrary 
-                templates={formatTemplates()}
-                onAddTemplate={() => {
-                  toast({
-                    title: "Add Template",
-                    description: "Template creation feature coming soon!"
-                  });
-                }}
-                onEditTemplate={(id) => {
-                  toast({
-                    title: "Edit Template",
-                    description: `Editing template ID: ${id}`
-                  });
-                }}
-                onMoreOptions={(id) => {
-                  toast({
-                    title: "Template Options",
-                    description: `Options for template ID: ${id}`
-                  });
-                }}
-              />
+          </div>
+          
+          {/* Template Library */}
+          <div className="bg-surface rounded-lg p-5 mb-6">
+            <div className="flex justify-between items-center mb-5">
+              <h3 className="font-bold">Video Templates</h3>
+              <Link href="/video-templates" className="text-primary text-sm hover:underline">
+                Manage Templates
+              </Link>
             </div>
+            
+            <TemplateLibrary 
+              templates={formatTemplates()}
+              onAddTemplate={() => {
+                toast({
+                  title: "Add Template",
+                  description: "Template creation feature coming soon!"
+                });
+              }}
+              onEditTemplate={(id) => {
+                toast({
+                  title: "Edit Template",
+                  description: `Editing template ID: ${id}`
+                });
+              }}
+              onMoreOptions={(id) => {
+                toast({
+                  title: "Template Options",
+                  description: `Options for template ID: ${id}`
+                });
+              }}
+            />
           </div>
         </div>
       </main>

@@ -42,16 +42,14 @@ export function ContentGenerator({ contentSources, videoTemplates, onSuccess }: 
     
     try {
       // Step 1: Fetch data from content source
-      const contentResponse = await apiRequest('/api/generate-content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
+      const contentResponse = await apiRequest(
+        'POST',
+        '/api/generate-content',
+        {
           sourceId: parseInt(sourceId),
           templateId: parseInt(templateId)
-        })
-      } as RequestInit);
+        }
+      );
       
       if (!contentResponse.ok) {
         throw new Error("Failed to generate content");

@@ -629,10 +629,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await storage.createSocialPost({
               videoId: video.id,
               platformId: platform.id,
-              scheduledFor: new Date(),
+              postText: `New content alert! 🎮 ${contentTitle}
+Check out our latest ${template.name.toLowerCase()} video created from ${source.name}.`,
+              hashtags: '#entertainment #gaming #automation',
               status: 'scheduled',
+              scheduledAt: new Date(),
               postData: {
-                hashtags: ['entertainment', 'gaming', 'automation'],
                 caption: `New content alert! 🎮 ${contentTitle}`,
                 description: `Check out our latest ${template.name.toLowerCase()} video created from ${source.name}.`,
                 title: `${contentTitle} - Perfect for ${platform.name}!`
