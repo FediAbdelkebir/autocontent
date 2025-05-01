@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 100%;
+    
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 100%;
+    
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 100%;
+    
+    --primary: 271 100% 65%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 138 100% 39%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 73%;
+    
+    --accent: 0 0% 16%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 100% 66%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 271 100% 65%;
+
+    --chart-1: 271 100% 65%;
+    --chart-2: 138 100% 39%;
+    --chart-3: 0 100% 66%;
+    --chart-4: 45 100% 62%;
+    --chart-5: 220 100% 50%;
+
+    --sidebar-background: 0 0% 12%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 271 100% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 16%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 271 100% 65%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .error-bg {
+    @apply bg-destructive bg-opacity-10 border border-destructive border-opacity-30 rounded-lg;
+  }
+  
+  .warning-bg {
+    @apply bg-[#FFD740] bg-opacity-10 border border-[#FFD740] border-opacity-30 rounded-lg;
+  }
+  
+  .success-bg {
+    @apply bg-secondary bg-opacity-10 border border-secondary border-opacity-30 rounded-lg;
+  }
+  
+  .sidebar-link {
+    @apply flex items-center px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-opacity-10 hover:bg-primary transition-colors;
+  }
+  
+  .sidebar-link-active {
+    @apply flex items-center px-4 py-3 text-primary border-l-4 border-primary bg-opacity-10 bg-primary;
+  }
+  
+  .sidebar-header {
+    @apply px-4 mb-2 text-muted-foreground text-xs font-semibold uppercase tracking-wider;
+  }
+  
+  .status-badge-success {
+    @apply bg-secondary bg-opacity-20 text-secondary px-2 py-0.5 rounded-full text-xs;
+  }
+  
+  .status-badge-warning {
+    @apply bg-[#FFD740] bg-opacity-20 text-[#FFD740] px-2 py-0.5 rounded-full text-xs;
+  }
+  
+  .status-badge-error {
+    @apply bg-destructive bg-opacity-20 text-destructive px-2 py-0.5 rounded-full text-xs;
+  }
+
+  .stats-card-icon {
+    @apply w-10 h-10 rounded-full bg-opacity-20 flex items-center justify-center;
+  }
+}
