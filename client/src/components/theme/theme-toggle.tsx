@@ -1,55 +1,52 @@
-import { Moon, Sun, Laptop } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useTheme } from "@/components/theme/theme-provider";
 
 export function ThemeToggle() {
-  const { theme, setTheme, isDarkMode } = useTheme();
+  const [isDark, setIsDark] = useState(false);
+  
+  // Initialize theme based on local storage or default to light
+  useEffect(() => {
+    // Check if document exists (we're in the browser)
+    if (typeof document !== 'undefined') {
+      // Get the current theme from body class
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      setIsDark(isDarkMode);
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    const newIsDark = !isDark;
+    
+    setIsDark(newIsDark);
+    
+    if (newIsDark) {
+      root.classList.add('dark');
+      document.body.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      document.body.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   return (
-    <div className="relative">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex gap-2 min-w-[100px] justify-between"
-          >
-            {theme === "light" && (
-              <>
-                <Sun className="h-[1.2rem] w-[1.2rem] text-amber-500" />
-                <span>Light</span>
-              </>
-            )}
-            {theme === "dark" && (
-              <>
-                <Moon className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
-                <span>Dark</span>
-              </>
-            )}
-            {theme === "system" && (
-              <>
-                <Laptop className="h-[1.2rem] w-[1.2rem]" />
-                <span>System ({isDarkMode ? 'Dark' : 'Light'})</span>
-              </>
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer">
-            <Sun className="mr-2 h-4 w-4 text-amber-500" />
-            <span>Light</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer">
-            <Moon className="mr-2 h-4 w-4 text-indigo-400" />
-            <span>Dark</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer">
-            <Laptop className="mr-2 h-4 w-4" />
-            <span>System</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={toggleTheme}
+      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      className="w-10 h-10 rounded-full"
+    >
+      {isDark ? (
+        <Sun className="h-[1.2rem] w-[1.2rem] text-yellow-400" />
+      ) : (
+        <Moon className="h-[1.2rem] w-[1.2rem] text-indigo-400" />
+      )}
+    </Button>
   );
 }
