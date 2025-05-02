@@ -576,17 +576,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
       
-      // Create video
-      const video = await storage.createVideo({
+      // Create video using the video creation service
+      const videoResult = await createVideoContent({
+        contentId: contentItem.id,
+        templateId: template.id,
         title: contentTitle,
         description: `Video generated from ${source.name} using ${template.name} template`,
-        contentItemId: contentItem.id,
-        templateId: template.id,
-        duration: Math.floor(Math.random() * 60) + 30, // Random duration between 30-90 seconds
-        videoUrl: 'https://example.com/video.mp4',
-        thumbnailUrl: 'https://picsum.photos/600/400',
-        status: 'processing'
+        contentText: `Content from ${source.name}`, // In a real implementation this would be actual content from the source
+        contentImageUrl: 'https://picsum.photos/600/400' // Sample image for demo
       });
+      
+      if (!videoResult.success) {
+        throw new Error(`Failed to start video creation: ${videoResult.message}`);
+      }
       
       // Log activity
       await storage.createActivityLog({
@@ -598,7 +600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         details: {
           sourceId,
           templateId,
-          videoId: video.id
+          videoId: videoResult.videoId
         }
       });
       
@@ -610,96 +612,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         {
           source: 'content-generator',
           contentItemId: contentItem.id,
-          videoId: video.id
+          videoId: videoResult.videoId
         }
       );
       
-      // In a real implementation, this would trigger a Make.com workflow
-      // For demo purposes, we'll simulate this by updating the video status after a delay
-      setTimeout(async () => {
-        try {
-          // Update video to completed
-          await storage.updateVideo(video.id, {
-            status: 'ready',
-            completedAt: new Date()
-          });
-          
-          // Create social posts
-          const platforms = await storage.getSocialPlatforms();
-          for (const platform of platforms) {
-            await storage.createSocialPost({
-              videoId: video.id,
-              platformId: platform.id,
-              postText: `New content alert! 🎮 ${contentTitle}
-Check out our latest ${template.name.toLowerCase()} video created from ${source.name}.`,
-              hashtags: '#entertainment #gaming #automation',
-              status: 'scheduled',
-              scheduledAt: new Date()
-            });
-          }
-          
-          // Log completion
-          await storage.createActivityLog({
-            action: 'video_ready',
-            status: 'success',
-            message: `Video ready: ${contentTitle}`,
-            entityType: 'video',
-            entityId: video.id
-          });
-          
-          // Send completion notification to Slack
-          try {
-            await sendAlertToSlack(
-              'Video Generation Complete',
-              `Successfully generated video "${contentTitle}". Social media posts have been scheduled.`,
-              'success',
-              {
-                source: 'content-generator',
-                videoId: video.id,
-                socialPlatforms: platforms.length
-              }
-            );
-          } catch (slackError) {
-            console.log('Slack notification failed but content generation completed successfully');
-          }
-        } catch (error) {
-          console.error('Error in video processing completion:', error);
-          
-          // Log error
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          
-          await storage.createActivityLog({
-            action: 'video_generation_error',
-            status: 'error',
-            message: `Error completing video generation: ${errorMessage}`,
-            entityType: 'video',
-            entityId: video.id
-          });
-          
-          // Send error alert to Slack
-          try {
-            await sendAlertToSlack(
-              'Video Generation Failed',
-              `There was an error generating video "${contentTitle}".`,
-              'error',
-              {
-                source: 'content-generator',
-                videoId: video.id,
-                error: errorMessage
-              }
-            );
-          } catch (slackError) {
-            console.log('Slack error notification failed');
-          }
-        }
-      }, 5000); // 5 second delay to simulate processing
+      // The video creation service handles the delayed processing and status updates
+      // including creating social posts after the video is ready
       
       return res.status(201).json({
         success: true,
         message: 'Content generation started',
         title: contentTitle,
         contentItemId: contentItem.id,
-        videoId: video.id
+        videoId: videoResult.videoId
       });
     } catch (error) {
       console.error('Error generating content:', error);

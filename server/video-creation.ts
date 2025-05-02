@@ -50,13 +50,9 @@ export async function createVideoContent(request: VideoCreationRequest): Promise
       videoUrl: null,
       thumbnailUrl: 'https://placehold.co/600x400/333/FFF?text=Processing+Video',
       duration: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      publishStatus: 'draft',
-      metadata: JSON.stringify({
-        processingStage: 'initializing',
-        templateUsed: request.templateId
-      })
+      makeScenarioId: `local-${Date.now()}`,
+      createdAt: new Date()
+      // The schema doesn't include publishStatus or metadata fields
     };
 
     const video = await createVideo(videoData);
@@ -73,13 +69,7 @@ export async function createVideoContent(request: VideoCreationRequest): Promise
           videoUrl: `https://example.com/videos/demo-${video.id}.mp4`,
           thumbnailUrl: `https://placehold.co/600x400/5A3FFF/FFF?text=Video+${video.id}`,
           duration: 120, // 2 minutes demo video
-          publishStatus: 'ready_to_publish',
-          metadata: JSON.stringify({
-            processingStage: 'completed',
-            templateUsed: request.templateId,
-            completedAt: new Date().toISOString()
-          }),
-          updatedAt: new Date()
+          completedAt: new Date()
         });
 
         // Log success
@@ -91,7 +81,7 @@ export async function createVideoContent(request: VideoCreationRequest): Promise
           message: `Video "${request.title}" is ready for publishing`
         });
 
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error updating video status:', error);
         
         // Log failure
@@ -100,7 +90,7 @@ export async function createVideoContent(request: VideoCreationRequest): Promise
           status: 'error',
           entityId: request.contentId,
           entityType: 'video',
-          message: `Failed to update video status: ${error.message}`
+          message: `Failed to update video status: ${error?.message || 'Unknown error'}`
         });
 
         // Send alert to Slack
@@ -108,7 +98,7 @@ export async function createVideoContent(request: VideoCreationRequest): Promise
           'Video Processing Failed',
           `There was an error updating the video status for "${request.title}"`,
           'error',
-          { videoId: video.id, error: error.message }
+          { videoId: video.id, error: error?.message || 'Unknown error' }
         );
       }
     }, 5000); // 5 second delay to simulate processing
@@ -119,8 +109,9 @@ export async function createVideoContent(request: VideoCreationRequest): Promise
       message: 'Video creation started successfully'
     };
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating video:', error);
+    const errorMessage = error?.message || 'Unknown error';
 
     // Log failure
     await createActivityLog({
@@ -128,7 +119,7 @@ export async function createVideoContent(request: VideoCreationRequest): Promise
       status: 'error',
       entityId: request.contentId,
       entityType: 'content_item',
-      message: `Failed to create video: ${error.message}`
+      message: `Failed to create video: ${errorMessage}`
     });
 
     // Send alert to Slack
@@ -136,12 +127,12 @@ export async function createVideoContent(request: VideoCreationRequest): Promise
       'Video Creation Failed',
       `Failed to create video for "${request.title}"`,
       'error',
-      { contentId: request.contentId, error: error.message }
+      { contentId: request.contentId, error: errorMessage }
     );
 
     return {
       success: false,
-      message: `Error creating video: ${error.message}`
+      message: `Error creating video: ${errorMessage}`
     };
   }
 }
@@ -186,9 +177,9 @@ async function createVideoWithExternalAPI(request: VideoCreationRequest): Promis
       status: 'processing',
       estimated_completion_time: new Date(Date.now() + 60000).toISOString() // 1 minute from now
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error calling external video API:', error);
-    throw error;
+    throw new Error(error?.message || 'Unknown error in video API call');
   }
 }
 
