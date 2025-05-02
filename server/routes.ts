@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import * as storage from "./storage";
 import { sendAlertToSlack } from "./slack";
+import { createVideoContent } from "./video-creation";
 import { z } from "zod";
 import { 
   contentSourceSchema,
