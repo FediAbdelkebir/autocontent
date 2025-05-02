@@ -4,6 +4,8 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { Sidebar } from "@/components/layout/sidebar";
 import { MobileHeader } from "@/components/layout/mobile-header";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
 
 // Pages
 import Dashboard from "@/pages/dashboard";
@@ -13,6 +15,7 @@ import SocialMedia from "@/pages/social-media";
 import Settings from "@/pages/settings";
 import Alerts from "@/pages/alerts";
 import ActivityLogs from "@/pages/activity-logs";
+import AuthPage from "@/pages/auth-page";
 import NotFound from "@/pages/not-found";
 
 import { useEffect } from "react";
@@ -52,26 +55,63 @@ function Router() {
   }, []);
   
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/content-sources" component={ContentSources} />
-        <Route path="/video-templates" component={VideoTemplates} />
-        <Route path="/social-media" component={SocialMedia} />
-        <Route path="/settings" component={Settings} />
-        <Route path="/alerts" component={Alerts} />
-        <Route path="/activity-logs" component={ActivityLogs} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
+    <Switch>
+      <Route path="/auth" component={AuthPage} />
+      
+      <ProtectedRoute path="/" component={() => (
+        <Layout>
+          <Dashboard />
+        </Layout>
+      )} />
+      
+      <ProtectedRoute path="/content-sources" component={() => (
+        <Layout>
+          <ContentSources />
+        </Layout>
+      )} />
+      
+      <ProtectedRoute path="/video-templates" component={() => (
+        <Layout>
+          <VideoTemplates />
+        </Layout>
+      )} />
+      
+      <ProtectedRoute path="/social-media" component={() => (
+        <Layout>
+          <SocialMedia />
+        </Layout>
+      )} />
+      
+      <ProtectedRoute path="/settings" component={() => (
+        <Layout>
+          <Settings />
+        </Layout>
+      )} />
+      
+      <ProtectedRoute path="/alerts" component={() => (
+        <Layout>
+          <Alerts />
+        </Layout>
+      )} />
+      
+      <ProtectedRoute path="/activity-logs" component={() => (
+        <Layout>
+          <ActivityLogs />
+        </Layout>
+      )} />
+      
+      <Route component={NotFound} />
+    </Switch>
   );
 }
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
