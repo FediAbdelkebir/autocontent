@@ -95,8 +95,21 @@ export const WorkflowVisualizer = ({
       <div className="grid grid-cols-3 mb-8 relative z-10">
         {steps.map((step, index) => (
           <div className="flex flex-col items-center" key={index}>
-            <div className={`w-12 h-12 rounded-full ${getStepIconBackground(step.status)} flex items-center justify-center mb-2`}>
+            <div className={`w-12 h-12 rounded-full ${getStepIconBackground(step.status)} border-2 ${
+              step.status === "completed" || step.status === "success" ? "border-green-500 dark:border-green-400" : 
+              step.status === "active" ? "border-primary" : 
+              step.status === "error" ? "border-red-500 dark:border-red-400" :
+              "border-gray-300 dark:border-gray-600"
+            } flex items-center justify-center mb-2 relative`}>
               <i className={`${step.icon} ${step.status === "active" ? "text-primary" : getStatusClass(step.status)} text-xl`}></i>
+              {index > 0 && (
+                <div className="absolute -left-full top-1/2 w-full h-0.5 -translate-y-1/2 bg-gray-300 dark:bg-gray-700"></div>
+              )}
+              {(step.status === "completed" || step.status === "success") && (
+                <div className="absolute -right-2 -bottom-1 w-5 h-5 bg-green-500 dark:bg-green-400 rounded-full flex items-center justify-center">
+                  <i className="ri-check-line text-white text-xs"></i>
+                </div>
+              )}
             </div>
             <div className="text-center">
               <h4 className="font-medium">{step.name}</h4>

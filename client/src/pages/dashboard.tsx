@@ -152,49 +152,52 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatsCard 
-          title="Videos Created Today" 
-          value={isLoadingStats ? "..." : (stats as any)?.videosCreatedToday || 0}
-          icon="ri-video-line"
-          iconColor="primary"
-          trend={{
-            value: "23%",
-            isPositive: true,
-            label: "vs. yesterday"
-          }}
-        />
-        
-        <StatsCard 
-          title="Posts Published" 
-          value={isLoadingStats ? "..." : (stats as any)?.postsPublished || 0}
-          icon="ri-share-line"
-          iconColor="secondary"
-          trend={{
-            value: "18%",
-            isPositive: true,
-            label: "vs. yesterday"
-          }}
-        />
-        
-        <StatsCard 
-          title="Content Sources Active" 
-          value={isLoadingStats ? "..." : (stats as any)?.activeContentSources || 0}
-          icon="ri-database-2-line"
-          iconColor="warning"
-          trend={{
-            value: "1",
-            isPositive: false,
-            label: "source offline"
-          }}
-        />
-        
-        <StatsCard 
-          title="System Alerts" 
-          value={isLoadingStats ? "..." : (stats as any)?.systemAlerts || 0}
-          icon="ri-error-warning-line"
-          iconColor="destructive"
-        />
+      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-6">
+        <h3 className="font-bold text-lg mb-4">Overview Statistics</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatsCard 
+            title="Videos Created Today" 
+            value={isLoadingStats ? "..." : (stats as any)?.videosCreatedToday || 0}
+            icon="ri-video-line"
+            iconColor="primary"
+            trend={{
+              value: "23%",
+              isPositive: true,
+              label: "vs. yesterday"
+            }}
+          />
+          
+          <StatsCard 
+            title="Posts Published" 
+            value={isLoadingStats ? "..." : (stats as any)?.postsPublished || 0}
+            icon="ri-share-line"
+            iconColor="secondary"
+            trend={{
+              value: "18%",
+              isPositive: true,
+              label: "vs. yesterday"
+            }}
+          />
+          
+          <StatsCard 
+            title="Content Sources Active" 
+            value={isLoadingStats ? "..." : (stats as any)?.activeContentSources || 0}
+            icon="ri-database-2-line"
+            iconColor="warning"
+            trend={{
+              value: "1",
+              isPositive: false,
+              label: "source offline"
+            }}
+          />
+          
+          <StatsCard 
+            title="System Alerts" 
+            value={isLoadingStats ? "..." : (stats as any)?.systemAlerts || 0}
+            icon="ri-error-warning-line"
+            iconColor="destructive"
+          />
+        </div>
       </div>
 
       {/* Alert Banner */}
@@ -221,10 +224,10 @@ const Dashboard = () => {
         {/* Left Column */}
         <div className="lg:col-span-3 space-y-6">
           {/* Content Generator */}
-          <div className="bg-surface rounded-lg p-5">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-5">
             <div className="mb-5">
               <h3 className="font-bold text-lg">Generate New Content</h3>
-              <p className="text-muted-foreground text-sm">Create new video content with just a few clicks</p>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">Create new video content with just a few clicks</p>
             </div>
             <ContentGenerator 
               contentSources={Array.isArray(contentSources) ? contentSources : []}
@@ -234,11 +237,11 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Content */}
-          <div className="bg-surface rounded-lg p-5">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-5">
             <div className="flex justify-between items-center mb-5">
               <div>
                 <h3 className="font-bold text-lg">Recent Content</h3>
-                <p className="text-muted-foreground text-sm">Your latest generated content</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">Your latest generated content</p>
               </div>
               <Link href="/content-sources" className="text-primary text-sm hover:underline">
                 View All
@@ -251,11 +254,11 @@ const Dashboard = () => {
         {/* Right Column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Workflow Status */}
-          <div className="bg-surface rounded-lg p-5">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-5">
             <div className="flex justify-between items-center mb-5">
               <h3 className="font-bold text-lg">System Status</h3>
               <select 
-                className="bg-background text-muted-foreground rounded px-2 py-1 text-sm border border-border"
+                className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded px-2 py-1 text-sm border border-gray-200 dark:border-gray-700"
                 value={timeFrame}
                 onChange={(e) => setTimeFrame(e.target.value)}
               >
@@ -280,7 +283,7 @@ const Dashboard = () => {
           </div>
           
           {/* Recent Activities */}
-          <div className="bg-surface rounded-lg p-5">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-5">
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-bold text-lg">Activity Log</h3>
               <Link href="/activity-logs" className="text-primary text-sm hover:underline">
@@ -295,7 +298,7 @@ const Dashboard = () => {
           </div>
           
           {/* Make.com Integration Status */}
-          <div className="bg-surface rounded-lg p-5">
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-5">
             <IntegrationStatus 
               integrations={formatMakeIntegrations()}
               connectionStatus="connected"

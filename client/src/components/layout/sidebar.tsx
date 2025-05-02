@@ -16,11 +16,8 @@ export const Sidebar = () => {
             <i className="ri-film-line text-primary text-2xl"></i>
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">AutoContent</h1>
           </div>
+          <ThemeToggle />
         </div>
-      </div>
-      
-      <div className="p-3 flex justify-end">
-        <ThemeToggle />
       </div>
       
       <nav className="mt-4 flex flex-col h-[calc(100vh-160px)] overflow-y-auto">

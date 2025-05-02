@@ -78,14 +78,13 @@ export const MobileHeader = () => {
         }`}
       >
         <div className="p-5 border-b border-gray-200 dark:border-gray-800">
-          <div className="flex items-center space-x-2">
-            <i className="ri-film-line text-primary text-2xl"></i>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">AutoContent</h1>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <i className="ri-film-line text-primary text-2xl"></i>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">AutoContent</h1>
+            </div>
+            <ThemeToggle />
           </div>
-        </div>
-        
-        <div className="p-3 flex justify-end">
-          <ThemeToggle />
         </div>
         
         <nav className="pt-3 pb-20"> {/* Extra padding at bottom for scrolling on small devices */}
