@@ -1,7 +1,7 @@
 interface WorkflowStep {
   name: string;
   icon: string;
-  status: "active" | "warning" | "error";
+  status: "active" | "warning" | "error" | "completed" | "success";
 }
 
 interface Platform {
@@ -31,14 +31,16 @@ export const WorkflowVisualizer = ({
   const getStatusClass = (status: string) => {
     switch (status) {
       case "active":
-        return "text-secondary";
+      case "success":
+      case "completed":
+        return "text-green-600 dark:text-green-400";
       case "warning":
-        return "text-[#FFD740]";
+        return "text-amber-600 dark:text-amber-400";
       case "error":
       case "rate_limited":
-        return "text-destructive";
+        return "text-red-600 dark:text-red-400";
       default:
-        return "text-muted-foreground";
+        return "text-gray-500 dark:text-gray-400";
     }
   };
 
@@ -46,6 +48,9 @@ export const WorkflowVisualizer = ({
     switch (status) {
       case "active":
         return "ri-checkbox-circle-line";
+      case "success":
+      case "completed":
+        return "ri-check-double-line";
       case "warning":
         return "ri-alert-line";
       case "error":
@@ -60,6 +65,9 @@ export const WorkflowVisualizer = ({
     switch (status) {
       case "active":
         return "Running Normally";
+      case "success":
+      case "completed":
+        return "Completed";
       case "warning":
         return "Minor Issues";
       case "error":
@@ -75,21 +83,25 @@ export const WorkflowVisualizer = ({
     switch (status) {
       case "active":
         return "bg-primary bg-opacity-20";
+      case "success":
+      case "completed":
+        return "bg-green-100 dark:bg-green-900 bg-opacity-50 dark:bg-opacity-50";
       case "warning":
-        return "bg-[#FFD740] bg-opacity-20";
+        return "bg-amber-100 dark:bg-amber-900 bg-opacity-50 dark:bg-opacity-50";
       case "error":
-        return "bg-destructive bg-opacity-20";
+      case "rate_limited":
+        return "bg-red-100 dark:bg-red-900 bg-opacity-50 dark:bg-opacity-50";
       default:
-        return "bg-muted";
+        return "bg-gray-100 dark:bg-gray-800";
     }
   };
 
   return (
     <div className="relative">
       {/* Connection Lines */}
-      <div className="absolute top-12 left-[6.5rem] w-[calc(100%-13rem)] h-0.5 bg-gray-700 z-0"></div>
-      <div className="absolute top-[5.75rem] left-[6.5rem] w-0.5 h-14 bg-gray-700 z-0"></div>
-      <div className="absolute top-[5.75rem] right-[6.5rem] w-0.5 h-14 bg-gray-700 z-0"></div>
+      <div className="absolute top-12 left-[6.5rem] w-[calc(100%-13rem)] h-0.5 bg-gray-300 dark:bg-gray-700 z-0"></div>
+      <div className="absolute top-[5.75rem] left-[6.5rem] w-0.5 h-14 bg-gray-300 dark:bg-gray-700 z-0"></div>
+      <div className="absolute top-[5.75rem] right-[6.5rem] w-0.5 h-14 bg-gray-300 dark:bg-gray-700 z-0"></div>
       
       {/* Workflow Steps */}
       <div className="grid grid-cols-3 mb-8 relative z-10">
@@ -125,12 +137,14 @@ export const WorkflowVisualizer = ({
       {/* Platform Status */}
       <div className="grid grid-cols-4 gap-3">
         {platforms.map((platform, index) => (
-          <div className="bg-background rounded p-3 text-center" key={index}>
+          <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-center" key={index}>
             <i className={`${platform.icon} text-xl mb-2 ${
               platform.icon.includes('youtube') ? 'text-[#FF0000]' : 
-              platform.icon.includes('instagram') ? 'text-[#E1306C]' : ''
+              platform.icon.includes('instagram') ? 'text-[#E1306C]' : 
+              platform.icon.includes('tiktok') ? 'text-[#000000] dark:text-white' :
+              platform.icon.includes('twitter') ? 'text-[#1DA1F2]' : ''
             }`}></i>
-            <h5 className="text-sm font-medium">{platform.name}</h5>
+            <h5 className="text-sm font-medium text-gray-800 dark:text-gray-200">{platform.name}</h5>
             <p className={`text-xs ${getStatusClass(platform.status)} mt-1`}>
               {getStatusText(platform.status)}
             </p>
