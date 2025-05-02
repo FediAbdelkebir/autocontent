@@ -4,20 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useTheme } from "@/components/theme/theme-provider";
 
 export function ThemeToggle() {
-  const { setTheme, theme } = useTheme();
-
-  // Force theme change with console output to debug
-  const handleThemeChange = (newTheme: "light" | "dark" | "system") => {
-    console.log(`Changing theme from ${theme} to ${newTheme}`);
-    setTheme(newTheme);
-    
-    // Immediately log the theme state and DOM updates
-    setTimeout(() => {
-      console.log("Current theme:", document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-      console.log("HTML classes:", document.documentElement.className);
-      console.log("data-theme:", document.documentElement.getAttribute('data-theme'));
-    }, 50);
-  };
+  const { theme, setTheme, isDarkMode } = useTheme();
 
   return (
     <div className="relative">
@@ -43,21 +30,21 @@ export function ThemeToggle() {
             {theme === "system" && (
               <>
                 <Laptop className="h-[1.2rem] w-[1.2rem]" />
-                <span>System</span>
+                <span>System ({isDarkMode ? 'Dark' : 'Light'})</span>
               </>
             )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => handleThemeChange("light")} className="cursor-pointer">
+          <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer">
             <Sun className="mr-2 h-4 w-4 text-amber-500" />
             <span>Light</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleThemeChange("dark")} className="cursor-pointer">
+          <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer">
             <Moon className="mr-2 h-4 w-4 text-indigo-400" />
             <span>Dark</span>
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleThemeChange("system")} className="cursor-pointer">
+          <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer">
             <Laptop className="mr-2 h-4 w-4" />
             <span>System</span>
           </DropdownMenuItem>

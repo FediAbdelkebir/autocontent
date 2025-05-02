@@ -104,6 +104,17 @@
     
     color-scheme: dark;
   }
+  
+  /* Force immediate transition between themes to prevent flashing */
+  *, *::before, *::after {
+    transition-property: none;
+  }
+  
+  /* Add back transitions after page load */
+  :root.loaded *, :root.loaded *::before, :root.loaded *::after {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 200ms;
+  }
 }
 
 @layer base {
