@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export const Sidebar = () => {
   const [location] = useLocation();
@@ -10,9 +11,12 @@ export const Sidebar = () => {
   return (
     <aside className="w-64 bg-surface hidden md:block">
       <div className="p-4">
-        <div className="flex items-center space-x-2">
-          <i className="ri-film-line text-primary text-2xl"></i>
-          <h1 className="text-xl font-semibold">AutoContent</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <i className="ri-film-line text-primary text-2xl"></i>
+            <h1 className="text-xl font-semibold">AutoContent</h1>
+          </div>
+          <ThemeToggle />
         </div>
       </div>
       

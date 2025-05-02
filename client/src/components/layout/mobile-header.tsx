@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 export const MobileHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,14 +21,17 @@ export const MobileHeader = () => {
           <i className="ri-film-line text-primary text-2xl"></i>
           <h1 className="text-xl font-semibold">AutoContent</h1>
         </div>
-        <button 
-          type="button" 
-          className="text-muted-foreground" 
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          <i className="ri-menu-line text-2xl"></i>
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <button 
+            type="button" 
+            className="text-muted-foreground" 
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            <i className="ri-menu-line text-2xl"></i>
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}
