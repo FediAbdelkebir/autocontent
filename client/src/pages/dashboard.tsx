@@ -114,19 +114,31 @@ const Dashboard = () => {
   const formatMakeIntegrations = () => {
     if (!makeIntegrations || !Array.isArray(makeIntegrations) || makeIntegrations.length === 0) return [];
     
-    return makeIntegrations.map((integration: any) => ({
-      name: integration.name,
-      icon: "ri-flow-chart",
-      lastExecuted: formatTimeAgo(integration.lastExecuted || ""),
-      status: integration.status === "active" ? "active" : "error"
-    }));
+    return makeIntegrations.map((integration: any) => {
+      // Ensure status is one of the expected values
+      let status: "active" | "warning" | "error";
+      if (integration.status === "active") {
+        status = "active";
+      } else if (integration.status === "warning") {
+        status = "warning";
+      } else {
+        status = "error";
+      }
+      
+      return {
+        name: integration.name,
+        icon: "ri-flow-chart",
+        lastExecuted: formatTimeAgo(integration.lastExecuted || ""),
+        status
+      };
+    });
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen">
       <Sidebar />
       
-      <main className="flex-1 overflow-x-hidden overflow-y-auto">
+      <main className="md:pl-64 flex-1 overflow-x-hidden overflow-y-auto">
         <MobileHeader />
 
         <div className="p-4 md:p-6">
