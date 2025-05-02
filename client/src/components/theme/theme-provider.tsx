@@ -44,24 +44,34 @@ export function ThemeProvider({
     
     // First remove any existing theme classes
     root.classList.remove("light", "dark");
+    
+    const applyTheme = (activeTheme: string) => {
+      console.log(`Applying theme: ${activeTheme}`);
+      root.classList.add(activeTheme);
+      root.setAttribute('data-theme', activeTheme);
+      
+      // Force a repaint by making a tiny layout change and reverting it
+      const currentHeight = root.style.minHeight;
+      root.style.minHeight = '100.001vh';
+      setTimeout(() => {
+        root.style.minHeight = currentHeight;
+      }, 10);
+    };
 
     if (theme === "system") {
       // Check system preference
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
-
-      root.classList.add(systemTheme);
       
-      // Also set data-theme attribute for Tailwind
-      root.setAttribute('data-theme', systemTheme);
+      applyTheme(systemTheme);
     } else {
       // Apply theme directly
-      root.classList.add(theme);
-      
-      // Also set data-theme attribute for Tailwind
-      root.setAttribute('data-theme', theme);
+      applyTheme(theme);
     }
+    
+    // Store the theme in localStorage to persist it
+    localStorage.setItem('ui-theme', theme);
   }, [theme]);
 
   // Monitor system preference changes if using system theme

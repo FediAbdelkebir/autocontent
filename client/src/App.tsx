@@ -20,9 +20,9 @@ import { useEffect } from "react";
 // Layout component that wraps all pages with common elements
 function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen">
       <Sidebar />
-      <main className="flex-1 md:ml-64 overflow-x-hidden overflow-y-auto">
+      <main className="md:ml-60 overflow-x-hidden overflow-y-auto">
         <MobileHeader />
         <div className="p-4 md:p-6">
           {children}
