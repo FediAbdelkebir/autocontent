@@ -1,15 +1,8 @@
 import { type ChatPostMessageArguments, WebClient } from "@slack/web-api";
 
-// Check required environment variables
-if (!process.env.SLACK_BOT_TOKEN) {
-  throw new Error("SLACK_BOT_TOKEN environment variable must be set");
-}
-
-if (!process.env.SLACK_CHANNEL_ID) {
-  throw new Error("SLACK_CHANNEL_ID environment variable must be set");
-}
-
-const slack = new WebClient(process.env.SLACK_BOT_TOKEN);
+// Check if Slack integration is configured
+const isSlackConfigured = !!(process.env.SLACK_BOT_TOKEN && process.env.SLACK_CHANNEL_ID);
+const slack = isSlackConfigured ? new WebClient(process.env.SLACK_BOT_TOKEN) : null;
 
 /**
  * Sends a structured message to a Slack channel using the Slack Web API
@@ -19,9 +12,15 @@ const slack = new WebClient(process.env.SLACK_BOT_TOKEN);
 export async function sendSlackMessage(
   message: ChatPostMessageArguments
 ): Promise<string | undefined> {
+  // Check if Slack is configured
+  if (!isSlackConfigured || !slack) {
+    console.log('Slack not configured. Message not sent:', message.text);
+    return undefined;
+  }
+  
   try {
-    // Send the message
-    const response = await slack.chat.postMessage(message);
+    // Send the message - we already checked for null above
+    const response = await slack!.chat.postMessage(message);
 
     // Return the timestamp of the sent message
     return response.ts;
@@ -45,8 +44,14 @@ export async function sendAlertToSlack(
   type: "error" | "warning" | "info" | "success",
   details?: Record<string, any>
 ): Promise<void> {
+  // Check if Slack is configured
+  if (!isSlackConfigured) {
+    console.log(`Slack alert not sent (Slack not configured): ${type} - ${title}: ${message}`);
+    return;
+  }
+  
   try {
-    const channel = process.env.SLACK_CHANNEL_ID!;
+    const channel = process.env.SLACK_CHANNEL_ID || '';
     
     // Map type to emoji
     const typeEmoji = {

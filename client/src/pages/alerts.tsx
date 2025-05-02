@@ -122,9 +122,7 @@ const Alerts = () => {
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center">
-            <div className={`w-10 h-10 rounded-full ${getAlertTypeBg(alert.type)} flex items-center justify-center mr-3`}>
-              <i className={`${getAlertTypeIcon(alert.type)} ${getAlertTypeColor(alert.type)} text-lg`}></i>
-            </div>
+            <i className={`${getAlertTypeIcon(alert.type)} ${getAlertTypeColor(alert.type)} text-2xl mr-3`}></i>
             <CardTitle>{alert.title}</CardTitle>
           </div>
           <div className="text-xs text-muted-foreground">
@@ -222,9 +220,7 @@ const Alerts = () => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 bg-surface rounded-lg">
-                  <div className="w-16 h-16 bg-secondary bg-opacity-10 rounded-full flex items-center justify-center mb-4">
-                    <i className="ri-check-line text-secondary text-2xl"></i>
-                  </div>
+                  <i className="ri-checkbox-circle-fill text-secondary text-5xl mb-4"></i>
                   <h3 className="text-lg font-medium mb-2">No Active Alerts</h3>
                   <p className="text-muted-foreground text-center">
                     All systems are running normally. There are no active alerts at this time.
@@ -246,9 +242,7 @@ const Alerts = () => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 bg-surface rounded-lg">
-                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-                    <i className="ri-history-line text-muted-foreground text-2xl"></i>
-                  </div>
+                  <i className="ri-history-line text-muted-foreground text-5xl mb-4"></i>
                   <h3 className="text-lg font-medium mb-2">No Resolved Alerts</h3>
                   <p className="text-muted-foreground text-center">
                     There are no resolved alerts in the history.

@@ -16,16 +16,16 @@ export const IntegrationStatus = ({
   connectionStatus = "connected",
   onOpenExternal
 }: IntegrationStatusProps) => {
-  const getStatusColor = (status: string) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-secondary";
+        return "ri-checkbox-circle-fill text-secondary";
       case "warning":
-        return "bg-[#FFD740]";
+        return "ri-alert-fill text-[#FFD740]";
       case "error":
-        return "bg-destructive";
+        return "ri-error-warning-fill text-destructive";
       default:
-        return "bg-muted-foreground";
+        return "ri-question-fill text-muted-foreground";
     }
   };
 
@@ -74,7 +74,7 @@ export const IntegrationStatus = ({
                 <p className="text-muted-foreground text-xs mt-0.5">Last executed: {integration.lastExecuted}</p>
               </div>
             </div>
-            <span className={`w-3 h-3 rounded-full ${getStatusColor(integration.status)}`}></span>
+            <i className={`${getStatusIcon(integration.status)} text-base`}></i>
           </div>
         ))}
         

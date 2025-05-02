@@ -82,17 +82,17 @@ export const WorkflowVisualizer = ({
   const getStepIconBackground = (status: string) => {
     switch (status) {
       case "active":
-        return "bg-primary bg-opacity-20";
+        return "bg-white dark:bg-gray-800";
       case "success":
       case "completed":
-        return "bg-green-100 dark:bg-green-900 bg-opacity-50 dark:bg-opacity-50";
+        return "bg-white dark:bg-gray-800";
       case "warning":
-        return "bg-amber-100 dark:bg-amber-900 bg-opacity-50 dark:bg-opacity-50";
+        return "bg-white dark:bg-gray-800";
       case "error":
       case "rate_limited":
-        return "bg-red-100 dark:bg-red-900 bg-opacity-50 dark:bg-opacity-50";
+        return "bg-white dark:bg-gray-800";
       default:
-        return "bg-gray-100 dark:bg-gray-800";
+        return "bg-white dark:bg-gray-800";
     }
   };
 
@@ -107,19 +107,14 @@ export const WorkflowVisualizer = ({
       <div className="grid grid-cols-3 mb-8 relative z-10">
         {steps.map((step, index) => (
           <div className="flex flex-col items-center" key={index}>
-            <div className={`w-12 h-12 rounded-full ${getStepIconBackground(step.status)} border-2 ${
-              step.status === "completed" || step.status === "success" ? "border-green-500 dark:border-green-400" : 
-              step.status === "active" ? "border-primary" : 
-              step.status === "error" ? "border-red-500 dark:border-red-400" :
-              "border-gray-300 dark:border-gray-600"
-            } flex items-center justify-center mb-2 relative`}>
-              <i className={`${step.icon} ${step.status === "active" ? "text-primary" : getStatusClass(step.status)} text-xl`}></i>
+            <div className="w-12 h-12 flex items-center justify-center mb-2 relative">
+              <i className={`${step.icon} ${step.status === "active" ? "text-primary" : getStatusClass(step.status)} text-4xl`}></i>
               {index > 0 && (
                 <div className="absolute -left-full top-1/2 w-full h-0.5 -translate-y-1/2 bg-gray-300 dark:bg-gray-700"></div>
               )}
               {(step.status === "completed" || step.status === "success") && (
-                <div className="absolute -right-2 -bottom-1 w-5 h-5 bg-green-500 dark:bg-green-400 rounded-full flex items-center justify-center">
-                  <i className="ri-check-line text-white text-xs"></i>
+                <div className="absolute -right-2 -bottom-1 text-green-500 dark:text-green-400">
+                  <i className="ri-checkbox-circle-fill text-lg"></i>
                 </div>
               )}
             </div>
@@ -145,7 +140,8 @@ export const WorkflowVisualizer = ({
               platform.icon.includes('twitter') ? 'text-[#1DA1F2]' : ''
             }`}></i>
             <h5 className="text-sm font-medium text-gray-800 dark:text-gray-200">{platform.name}</h5>
-            <p className={`text-xs ${getStatusClass(platform.status)} mt-1`}>
+            <p className={`text-xs ${getStatusClass(platform.status)} mt-1 flex items-center justify-center`}>
+              <i className={`${getStatusIcon(platform.status)} mr-1`}></i>
               {getStatusText(platform.status)}
             </p>
           </div>
