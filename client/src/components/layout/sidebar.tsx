@@ -9,7 +9,7 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="w-64 bg-surface hidden md:block border-r border-border h-screen fixed left-0 top-0">
+    <aside className="w-64 bg-surface hidden md:flex md:flex-col border-r border-border h-screen">
       <div className="p-5 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
