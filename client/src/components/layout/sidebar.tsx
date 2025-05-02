@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { UserProfile } from "@/components/layout/user-profile";
 
 export const Sidebar = () => {
   const [location] = useLocation();
@@ -18,6 +19,10 @@ export const Sidebar = () => {
           </div>
           <ThemeToggle />
         </div>
+      </div>
+      
+      <div className="p-3 border-b border-gray-200 dark:border-gray-800">
+        <UserProfile />
       </div>
       
       <nav className="mt-4 flex flex-col h-[calc(100vh-160px)] overflow-y-auto">

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { UserProfile } from "@/components/layout/user-profile";
 import { useMobile } from "@/hooks/use-mobile";
 
 export const MobileHeader = () => {
@@ -50,6 +51,7 @@ export const MobileHeader = () => {
           <h1 className="text-xl font-semibold text-gray-900 dark:text-white">AutoContent</h1>
         </div>
         <div className="flex items-center gap-3">
+          <UserProfile />
           <ThemeToggle />
           <button 
             type="button" 
