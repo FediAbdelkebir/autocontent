@@ -1,10 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { useMobile } from "@/hooks/use-mobile";
 
 export const MobileHeader = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [location] = useLocation();
+  const isMobile = useMobile();
+
+  // Close mobile menu when switching to desktop
+  useEffect(() => {
+    if (!isMobile && isMenuOpen) {
+      setIsMenuOpen(false);
+    }
+  }, [isMobile, isMenuOpen]);
+
+  // Close mobile menu when location changes
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location]);
 
   const isActive = (path: string) => {
     return location === path ? "sidebar-link-active" : "sidebar-link";
@@ -14,9 +28,23 @@ export const MobileHeader = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Prevent scrolling when menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isMenuOpen]);
+
   return (
     <>
-      <div className="md:hidden bg-surface p-4 flex items-center justify-between">
+      {/* Mobile Header */}
+      <div className="md:hidden bg-surface p-4 sticky top-0 z-10 border-b border-border flex items-center justify-between shadow-sm">
         <div className="flex items-center space-x-2">
           <i className="ri-film-line text-primary text-2xl"></i>
           <h1 className="text-xl font-semibold">AutoContent</h1>
@@ -25,11 +53,11 @@ export const MobileHeader = () => {
           <ThemeToggle />
           <button 
             type="button" 
-            className="text-muted-foreground bg-background p-2 rounded-md" 
+            className="text-foreground bg-background p-2 rounded-md border border-border" 
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
-            <i className="ri-menu-line text-xl"></i>
+            <i className={`${isMenuOpen ? 'ri-close-line' : 'ri-menu-line'} text-xl`}></i>
           </button>
         </div>
       </div>
@@ -37,48 +65,47 @@ export const MobileHeader = () => {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsMenuOpen(false)}
+          aria-hidden="true"
         ></div>
       )}
 
       {/* Mobile Menu */}
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-surface z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
-        isMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
-        <div className="p-4 flex justify-between items-center">
+      <div 
+        className={`fixed top-0 left-0 h-screen w-4/5 max-w-xs bg-surface z-50 transform transition-transform duration-300 ease-in-out md:hidden overflow-y-auto ${
+          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="p-5 border-b border-border">
           <div className="flex items-center space-x-2">
             <i className="ri-film-line text-primary text-2xl"></i>
-            <h1 className="text-xl font-semibold">AutoContent</h1>
+            <h1 className="text-xl font-bold">AutoContent</h1>
           </div>
-          <button 
-            type="button" 
-            className="text-muted-foreground" 
-            onClick={toggleMenu}
-            aria-label="Close menu"
-          >
-            <i className="ri-close-line text-xl"></i>
-          </button>
         </div>
         
-        <nav className="mt-6">
+        <div className="p-3">
+          <ThemeToggle />
+        </div>
+        
+        <nav className="pt-3 pb-20"> {/* Extra padding at bottom for scrolling on small devices */}
           <div className="sidebar-header">
             Main
           </div>
           <Link href="/" className={isActive("/")} onClick={() => setIsMenuOpen(false)}>
-            <i className="ri-dashboard-line mr-3"></i>
+            <i className="ri-dashboard-line mr-3 text-lg"></i>
             <span>Dashboard</span>
           </Link>
           <Link href="/content-sources" className={isActive("/content-sources")} onClick={() => setIsMenuOpen(false)}>
-            <i className="ri-film-line mr-3"></i>
+            <i className="ri-film-line mr-3 text-lg"></i>
             <span>Content Sources</span>
           </Link>
           <Link href="/video-templates" className={isActive("/video-templates")} onClick={() => setIsMenuOpen(false)}>
-            <i className="ri-video-line mr-3"></i>
+            <i className="ri-video-line mr-3 text-lg"></i>
             <span>Video Templates</span>
           </Link>
           <Link href="/social-media" className={isActive("/social-media")} onClick={() => setIsMenuOpen(false)}>
-            <i className="ri-share-line mr-3"></i>
+            <i className="ri-share-line mr-3 text-lg"></i>
             <span>Social Media</span>
           </Link>
           
@@ -86,19 +113,27 @@ export const MobileHeader = () => {
             System
           </div>
           <Link href="/settings" className={isActive("/settings")} onClick={() => setIsMenuOpen(false)}>
-            <i className="ri-settings-line mr-3"></i>
+            <i className="ri-settings-line mr-3 text-lg"></i>
             <span>Settings</span>
           </Link>
           <Link href="/alerts" className={isActive("/alerts")} onClick={() => setIsMenuOpen(false)}>
-            <i className="ri-notification-line mr-3"></i>
+            <i className="ri-notification-line mr-3 text-lg"></i>
             <span>Alerts</span>
+            {/* Example of alert badge */}
+            <span className="ml-auto bg-destructive text-destructive-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">1</span>
           </Link>
           <Link href="/activity-logs" className={isActive("/activity-logs")} onClick={() => setIsMenuOpen(false)}>
-            <i className="ri-history-line mr-3"></i>
+            <i className="ri-history-line mr-3 text-lg"></i>
             <span>Activity Logs</span>
           </Link>
+          
+          <div className="mt-6 p-4 bg-muted rounded-lg mx-3 mb-3 text-sm">
+            <div className="font-medium mb-1">Need help?</div>
+            <p className="text-muted-foreground text-xs mb-2">Check out our documentation for help using the platform.</p>
+            <a href="#" className="text-primary text-xs hover:underline">View Documentation</a>
+          </div>
         </nav>
-      </aside>
+      </div>
     </>
   );
 };

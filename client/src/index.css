@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root, [data-theme="light"] {
     /* Light mode */
     --background: 210 20% 98%;
     --foreground: 224 71% 4%;
@@ -51,9 +51,11 @@
     --sidebar-ring: 262 83% 58%;
 
     --radius: 0.5rem;
+    
+    color-scheme: light;
   }
 
-  .dark {
+  .dark, [data-theme="dark"] {
     /* Dark mode */
     --background: 224 71% 4%;
     --foreground: 210 20% 98%;
@@ -99,6 +101,8 @@
     --sidebar-accent-foreground: 210 20% 98%;
     --sidebar-border: 240 5% 26%;
     --sidebar-ring: 262 83% 58%;
+    
+    color-scheme: dark;
   }
 }
 
