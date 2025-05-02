@@ -9,17 +9,17 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className="w-60 bg-surface hidden md:flex md:flex-col border-r border-border h-screen fixed left-0 top-0">
-      <div className="p-5 border-b border-border">
+    <aside className="w-64 bg-white dark:bg-gray-900 hidden md:flex md:flex-col border-r border-gray-200 dark:border-gray-800 h-screen fixed left-0 top-0">
+      <div className="p-5 border-b border-gray-200 dark:border-gray-800">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <i className="ri-film-line text-primary text-2xl"></i>
-            <h1 className="text-xl font-bold">AutoContent</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">AutoContent</h1>
           </div>
         </div>
       </div>
       
-      <div className="p-3">
+      <div className="p-3 flex justify-end">
         <ThemeToggle />
       </div>
       

@@ -44,16 +44,16 @@ export const MobileHeader = () => {
   return (
     <>
       {/* Mobile Header */}
-      <div className="md:hidden bg-surface p-4 sticky top-0 z-10 border-b border-border flex items-center justify-between shadow-sm">
+      <div className="md:hidden bg-white dark:bg-gray-900 p-4 sticky top-0 z-10 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shadow-sm">
         <div className="flex items-center space-x-2">
           <i className="ri-film-line text-primary text-2xl"></i>
-          <h1 className="text-xl font-semibold">AutoContent</h1>
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">AutoContent</h1>
         </div>
         <div className="flex items-center gap-3">
           <ThemeToggle />
           <button 
             type="button" 
-            className="text-foreground bg-background p-2 rounded-md border border-border" 
+            className="text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 p-2 rounded-md border border-gray-200 dark:border-gray-700" 
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
@@ -73,18 +73,18 @@ export const MobileHeader = () => {
 
       {/* Mobile Menu */}
       <div 
-        className={`fixed top-0 left-0 h-screen w-4/5 max-w-xs bg-surface z-50 transform transition-transform duration-300 ease-in-out md:hidden overflow-y-auto ${
+        className={`fixed top-0 left-0 h-screen w-4/5 max-w-xs bg-white dark:bg-gray-900 z-50 transform transition-transform duration-300 ease-in-out md:hidden overflow-y-auto ${
           isMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="p-5 border-b border-border">
+        <div className="p-5 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center space-x-2">
             <i className="ri-film-line text-primary text-2xl"></i>
-            <h1 className="text-xl font-bold">AutoContent</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">AutoContent</h1>
           </div>
         </div>
         
-        <div className="p-3">
+        <div className="p-3 flex justify-end">
           <ThemeToggle />
         </div>
         
@@ -127,9 +127,9 @@ export const MobileHeader = () => {
             <span>Activity Logs</span>
           </Link>
           
-          <div className="mt-6 p-4 bg-muted rounded-lg mx-3 mb-3 text-sm">
-            <div className="font-medium mb-1">Need help?</div>
-            <p className="text-muted-foreground text-xs mb-2">Check out our documentation for help using the platform.</p>
+          <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg mx-3 mb-3 text-sm">
+            <div className="font-medium mb-1 text-gray-900 dark:text-white">Need help?</div>
+            <p className="text-gray-600 dark:text-gray-300 text-xs mb-2">Check out our documentation for help using the platform.</p>
             <a href="#" className="text-primary text-xs hover:underline">View Documentation</a>
           </div>
         </nav>
