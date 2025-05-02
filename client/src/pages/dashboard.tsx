@@ -9,7 +9,6 @@ import { WorkflowVisualizer } from "@/components/dashboard/workflow-visualizer";
 import { ActivityLogComponent } from "@/components/dashboard/activity-log";
 import { ContentTable } from "@/components/dashboard/content-table";
 import { IntegrationStatus } from "@/components/dashboard/integration-status";
-import { TemplateLibrary } from "@/components/dashboard/template-library";
 import { ContentGenerator } from "@/components/dashboard/content-generator";
 import { Link } from "wouter";
 import { formatTimeAgo } from "@/lib/utils";
@@ -63,6 +62,24 @@ const Dashboard = () => {
     queryClient.invalidateQueries({ queryKey: ['/api/activity-logs'] });
   };
 
+  const handleResolveAlert = (alertId: number) => {
+    fetch(`/api/alerts/${alertId}/resolve`, { method: 'POST' })
+      .then(() => {
+        queryClient.invalidateQueries({ queryKey: ['/api/alerts'] });
+        toast({
+          title: "Alert resolved",
+          description: "The alert has been marked as resolved"
+        });
+      })
+      .catch(() => {
+        toast({
+          title: "Error",
+          description: "Failed to resolve the alert",
+          variant: "destructive"
+        });
+      });
+  };
+
   useEffect(() => {
     if (statsError || contentError || logsError || alertsError || integrationsError || templatesError || contentSourcesError) {
       toast({
@@ -74,11 +91,11 @@ const Dashboard = () => {
   }, [statsError, contentError, logsError, alertsError, integrationsError, templatesError, contentSourcesError, toast]);
 
   const formatContentItems = () => {
-    if (!recentContent || recentContent.length === 0) return [];
+    if (!recentContent || !Array.isArray(recentContent) || recentContent.length === 0) return [];
     
-    return recentContent.map(video => {
+    return recentContent.map((video: any) => {
       const platforms = video.socialPosts
-        ? video.socialPosts.map(post => post.platform.type)
+        ? video.socialPosts.map((post: any) => post.platform.type)
         : [];
       
       return {
@@ -95,31 +112,13 @@ const Dashboard = () => {
   };
 
   const formatMakeIntegrations = () => {
-    if (!makeIntegrations || makeIntegrations.length === 0) return [];
+    if (!makeIntegrations || !Array.isArray(makeIntegrations) || makeIntegrations.length === 0) return [];
     
-    return makeIntegrations.map(integration => ({
+    return makeIntegrations.map((integration: any) => ({
       name: integration.name,
       icon: "ri-flow-chart",
       lastExecuted: formatTimeAgo(integration.lastExecuted || ""),
       status: integration.status === "active" ? "active" : "error"
-    }));
-  };
-
-  const formatTemplates = () => {
-    if (!templates || templates.length === 0) return [];
-    
-    const iconMap: Record<string, string> = {
-      countdown: "ri-list-check",
-      trailer: "ri-movie-2-line",
-      news: "ri-newspaper-line",
-      gameplay: "ri-gamepad-line"
-    };
-    
-    return templates.map(template => ({
-      id: template.id,
-      name: template.name,
-      description: template.description || "",
-      icon: iconMap[template.type] || "ri-video-line"
     }));
   };
 
@@ -152,7 +151,7 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <StatsCard 
               title="Videos Created Today" 
-              value={isLoadingStats ? "..." : stats?.videosCreatedToday || 0}
+              value={isLoadingStats ? "..." : (stats as any)?.videosCreatedToday || 0}
               icon="ri-video-line"
               iconColor="primary"
               trend={{
@@ -164,7 +163,7 @@ const Dashboard = () => {
             
             <StatsCard 
               title="Posts Published" 
-              value={isLoadingStats ? "..." : stats?.postsPublished || 0}
+              value={isLoadingStats ? "..." : (stats as any)?.postsPublished || 0}
               icon="ri-share-line"
               iconColor="secondary"
               trend={{
@@ -176,7 +175,7 @@ const Dashboard = () => {
             
             <StatsCard 
               title="Content Sources Active" 
-              value={isLoadingStats ? "..." : stats?.activeContentSources || 0}
+              value={isLoadingStats ? "..." : (stats as any)?.activeContentSources || 0}
               icon="ri-database-2-line"
               iconColor="warning"
               trend={{
@@ -188,14 +187,14 @@ const Dashboard = () => {
             
             <StatsCard 
               title="System Alerts" 
-              value={isLoadingStats ? "..." : stats?.systemAlerts || 0}
+              value={isLoadingStats ? "..." : (stats as any)?.systemAlerts || 0}
               icon="ri-error-warning-line"
               iconColor="destructive"
             />
           </div>
 
           {/* Alert Banner */}
-          {!isLoadingAlerts && alerts && alerts.length > 0 && alerts[0].type === "error" && (
+          {!isLoadingAlerts && alerts && Array.isArray(alerts) && alerts.length > 0 && alerts[0].type === "error" && (
             <AlertBanner
               title={alerts[0].title}
               message={alerts[0].message}
@@ -213,113 +212,95 @@ const Dashboard = () => {
             />
           )}
 
-          {/* Workflow Status */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-            {/* Content Pipeline */}
-            <div className="bg-surface rounded-lg p-5 col-span-1 xl:col-span-2">
-              <div className="flex justify-between items-center mb-5">
-                <h3 className="font-bold">Content Pipeline</h3>
-                <select 
-                  className="bg-background text-muted-foreground rounded px-2 py-1 text-sm border border-gray-700"
-                  value={timeFrame}
-                  onChange={(e) => setTimeFrame(e.target.value)}
-                >
-                  <option value="last_24_hours">Last 24 hours</option>
-                  <option value="last_7_days">Last 7 days</option>
-                  <option value="last_30_days">Last 30 days</option>
-                </select>
+          {/* Main Dashboard Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6">
+            {/* Left Column */}
+            <div className="lg:col-span-3 space-y-6">
+              {/* Content Generator */}
+              <div className="bg-surface rounded-lg p-5">
+                <div className="mb-5">
+                  <h3 className="font-bold text-lg">Generate New Content</h3>
+                  <p className="text-muted-foreground text-sm">Create new video content with just a few clicks</p>
+                </div>
+                <ContentGenerator 
+                  contentSources={Array.isArray(contentSources) ? contentSources : []}
+                  videoTemplates={Array.isArray(templates) ? templates : []}
+                  onSuccess={handleContentGenerationSuccess}
+                />
+              </div>
+
+              {/* Recent Content */}
+              <div className="bg-surface rounded-lg p-5">
+                <div className="flex justify-between items-center mb-5">
+                  <div>
+                    <h3 className="font-bold text-lg">Recent Content</h3>
+                    <p className="text-muted-foreground text-sm">Your latest generated content</p>
+                  </div>
+                  <Link href="/content-sources" className="text-primary text-sm hover:underline">
+                    View All
+                  </Link>
+                </div>
+                <ContentTable items={formatContentItems().slice(0, 3)} />
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Workflow Status */}
+              <div className="bg-surface rounded-lg p-5">
+                <div className="flex justify-between items-center mb-5">
+                  <h3 className="font-bold text-lg">System Status</h3>
+                  <select 
+                    className="bg-background text-muted-foreground rounded px-2 py-1 text-sm border border-border"
+                    value={timeFrame}
+                    onChange={(e) => setTimeFrame(e.target.value)}
+                  >
+                    <option value="last_24_hours">Last 24h</option>
+                    <option value="last_7_days">Last 7d</option>
+                    <option value="last_30_days">Last 30d</option>
+                  </select>
+                </div>
+                <WorkflowVisualizer 
+                  steps={[
+                    { name: "Content Ingestion", icon: "ri-database-2-line", status: "active" },
+                    { name: "Video Generation", icon: "ri-video-line", status: "active" },
+                    { name: "Social Posting", icon: "ri-share-line", status: "error" }
+                  ]}
+                  platforms={[
+                    { name: "YouTube", icon: "ri-youtube-line", status: "active" },
+                    { name: "Instagram", icon: "ri-instagram-line", status: "active" },
+                    { name: "TikTok", icon: "ri-tiktok-line", status: "rate_limited" },
+                    { name: "X (Twitter)", icon: "ri-twitter-x-line", status: "active" }
+                  ]}
+                />
               </div>
               
-              <WorkflowVisualizer 
-                steps={[
-                  { name: "Content Ingestion", icon: "ri-database-2-line", status: "active" },
-                  { name: "Video Generation", icon: "ri-video-line", status: "active" },
-                  { name: "Social Posting", icon: "ri-share-line", status: "error" }
-                ]}
-                platforms={[
-                  { name: "YouTube", icon: "ri-youtube-line", status: "active" },
-                  { name: "Instagram", icon: "ri-instagram-line", status: "active" },
-                  { name: "TikTok", icon: "ri-tiktok-line", status: "rate_limited" },
-                  { name: "X (Twitter)", icon: "ri-twitter-x-line", status: "active" }
-                ]}
-              />
+              {/* Recent Activities */}
+              <div className="bg-surface rounded-lg p-5">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-bold text-lg">Activity Log</h3>
+                  <Link href="/activity-logs" className="text-primary text-sm hover:underline">
+                    View All
+                  </Link>
+                </div>
+                <ActivityLogComponent 
+                  logs={Array.isArray(activityLogs) ? activityLogs : []} 
+                  limit={4}
+                  showViewAll={false}
+                />
+              </div>
+              
+              {/* Make.com Integration Status */}
+              <div className="bg-surface rounded-lg p-5">
+                <IntegrationStatus 
+                  integrations={formatMakeIntegrations()}
+                  connectionStatus="connected"
+                  onOpenExternal={() => {
+                    window.open("https://www.make.com", "_blank");
+                  }}
+                />
+              </div>
             </div>
-            
-            {/* Recent Activities */}
-            <div className="bg-surface rounded-lg p-5">
-              <ActivityLogComponent 
-                logs={activityLogs || []} 
-                limit={5}
-                onViewAll={() => window.location.href = "/activity-logs"}
-              />
-            </div>
-          </div>
-
-          {/* Recent Content */}
-          <div className="bg-surface rounded-lg p-5 mb-6">
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="font-bold">Recent Content</h3>
-              <Link href="/content-sources" className="text-primary text-sm hover:underline">
-                View All
-              </Link>
-            </div>
-            
-            <ContentTable items={formatContentItems()} />
-          </div>
-          
-          {/* Content Generator & Make.com Integration */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* Content Generator */}
-            <div className="bg-surface rounded-lg p-5">
-              <ContentGenerator 
-                contentSources={contentSources || []}
-                videoTemplates={templates || []}
-                onSuccess={handleContentGenerationSuccess}
-              />
-            </div>
-            
-            {/* Make.com Integration Status */}
-            <div className="bg-surface rounded-lg p-5">
-              <IntegrationStatus 
-                integrations={formatMakeIntegrations()}
-                connectionStatus="connected"
-                onOpenExternal={() => {
-                  window.open("https://www.make.com", "_blank");
-                }}
-              />
-            </div>
-          </div>
-          
-          {/* Template Library */}
-          <div className="bg-surface rounded-lg p-5 mb-6">
-            <div className="flex justify-between items-center mb-5">
-              <h3 className="font-bold">Video Templates</h3>
-              <Link href="/video-templates" className="text-primary text-sm hover:underline">
-                Manage Templates
-              </Link>
-            </div>
-            
-            <TemplateLibrary 
-              templates={formatTemplates()}
-              onAddTemplate={() => {
-                toast({
-                  title: "Add Template",
-                  description: "Template creation feature coming soon!"
-                });
-              }}
-              onEditTemplate={(id) => {
-                toast({
-                  title: "Edit Template",
-                  description: `Editing template ID: ${id}`
-                });
-              }}
-              onMoreOptions={(id) => {
-                toast({
-                  title: "Template Options",
-                  description: `Options for template ID: ${id}`
-                });
-              }}
-            />
           </div>
         </div>
       </main>

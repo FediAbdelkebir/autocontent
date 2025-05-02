@@ -21,15 +21,15 @@ export const MobileHeader = () => {
           <i className="ri-film-line text-primary text-2xl"></i>
           <h1 className="text-xl font-semibold">AutoContent</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <ThemeToggle />
           <button 
             type="button" 
-            className="text-muted-foreground" 
+            className="text-muted-foreground bg-background p-2 rounded-md" 
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
-            <i className="ri-menu-line text-2xl"></i>
+            <i className="ri-menu-line text-xl"></i>
           </button>
         </div>
       </div>
