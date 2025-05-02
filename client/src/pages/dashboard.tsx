@@ -269,9 +269,9 @@ const Dashboard = () => {
             </div>
             <WorkflowVisualizer 
               steps={[
-                { name: "Content Ingestion", icon: "ri-database-2-line", status: "active" },
-                { name: "Video Generation", icon: "ri-video-line", status: "active" },
-                { name: "Social Posting", icon: "ri-share-line", status: "error" }
+                { name: "Content Ingestion", icon: "ri-rss-line", status: "success" },
+                { name: "Video Generation", icon: "ri-movie-2-line", status: "active" },
+                { name: "Social Posting", icon: "ri-share-forward-line", status: "error" }
               ]}
               platforms={[
                 { name: "YouTube", icon: "ri-youtube-line", status: "active" },

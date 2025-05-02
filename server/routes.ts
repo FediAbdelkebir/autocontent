@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import * as storage from "./storage";
 import { sendAlertToSlack } from "./slack";
 import { createVideoContent } from "./video-creation";
+import { setupAuth } from "./auth";
 import { z } from "zod";
 import { 
   contentSourceSchema,
@@ -13,11 +14,15 @@ import {
   socialPostSchema,
   activityLogSchema,
   makeIntegrationSchema,
-  alertSchema
+  alertSchema,
+  insertUserSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const apiPrefix = '/api';
+  
+  // Set up authentication routes and middleware
+  setupAuth(app);
 
   // Dashboard statistics
   app.get(`${apiPrefix}/dashboard/stats`, async (req, res) => {
